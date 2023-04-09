@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33403.129
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshReconstruction", "MeshReconstruction\MeshReconstruction.vcxproj", "{EC48135A-9A1D-4E3B-9CB0-58A713760537}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Debug|x64.ActiveCfg = Debug|x64
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Debug|x64.Build.0 = Debug|x64
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Debug|x86.ActiveCfg = Debug|Win32
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Debug|x86.Build.0 = Debug|Win32
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Release|x64.ActiveCfg = Release|x64
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Release|x64.Build.0 = Release|x64
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Release|x86.ActiveCfg = Release|Win32
+		{EC48135A-9A1D-4E3B-9CB0-58A713760537}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B535493A-3679-4C07-A7C0-138655B525F0}
+	EndGlobalSection
+EndGlobal
