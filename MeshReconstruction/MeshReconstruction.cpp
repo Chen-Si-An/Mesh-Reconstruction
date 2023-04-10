@@ -10,28 +10,6 @@
 #include <vector>
 using namespace std;
 
-typedef unsigned char BYTE;
-
-struct CDot
-{
-	double	m_x;
-	double	m_y;
-	double	m_z;
-
-	CDot(double dX = 0., double dY = 0., double dZ = 0.)
-	{
-		m_x = dX;
-		m_y = dY;
-		m_z = dZ;
-	}
-};
-
-struct CTriangle
-{
-	CDot m_dot[3];
-	CDot m_dotNormal;
-};
-
 enum
 {
 	FORMAT_UNKNOWN = 0,
@@ -99,7 +77,7 @@ typedef struct DATA_TYPE
 			return 0;
 	}
 
-	double TransformData(BYTE *pData) const
+	double TransformData(wchar_t *pData) const
 	{
 		if (m_strDataType == L"char")
 			return (double)*(char*)pData;
@@ -158,7 +136,7 @@ typedef struct VERTEX_PROPERTY
 		return m_dataType.GetDataSize();
 	}
 
-	double GetData(BYTE *pData) const
+	double GetData(wchar_t *pData) const
 	{
 		return m_dataType.TransformData(pData);
 	}
@@ -199,12 +177,12 @@ typedef struct FACE_PROPERTY
 		return m_dataIndex.GetDataSize();
 	}
 
-	int GetListNum(BYTE *pData) const
+	int GetListNum(wchar_t *pData) const
 	{
 		return (int)m_dataListNum.TransformData(pData);
 	}
 
-	int GetIndex(BYTE *pData) const
+	int GetIndex(wchar_t *pData) const
 	{
 		return (int)m_dataIndex.TransformData(pData);
 	}
@@ -231,30 +209,83 @@ typedef struct PLY_DATA
 	}
 } PLY_DATA;
 
-bool ReadPLY(const wstring &strPath, vector<CDot> &ayPoint, vector<CDot> &ayNorm);
+struct CDot
+{
+	double	m_x;
+	double	m_y;
+	double	m_z;
+
+	CDot(double dX = 0., double dY = 0., double dZ = 0.)
+	{
+		m_x = dX;
+		m_y = dY;
+		m_z = dZ;
+	}
+};
+
+typedef struct MESH_DATA
+{
+	vector<CDot> m_ayDot;
+	vector<CDot> m_ayNormal;
+	vector<int> m_ayFace;
+
+	~MESH_DATA()
+	{
+		vector<CDot>().swap(m_ayDot);
+		vector<CDot>().swap(m_ayNormal);
+		vector<int>().swap(m_ayFace);
+	}
+} MESH_DATA;
+
+struct CTriangle
+{
+	CDot m_dot[3];
+	CDot m_dotNormal;
+};
+
+bool ReadPLY(const wstring &strPath, MESH_DATA &meshData);
 
 int main()
 {
-	wstring str = L"ThIs iS a SaMpLe StRiNg";
-	transform(str.begin(), str.end(), str.begin(),
-		[](wchar_t c) -> wchar_t { return towlower(c); });
-	wcout << str << '\n';
+	MESH_DATA meshData;
+	ReadPLY(L"D:\\Data\\ply\\bottle_binary.ply", meshData);
 
 	system("pause");
 	return 0;
 }
 
+bool is_number(const wstring& str) {
+	try {
+		// Try to convert the string to an integer or floating-point number
+		size_t pos;
+		int i = std::stoi(str, &pos);
+		double d = std::stod(str, &pos);
+
+		// If the conversion succeeded and the entire string was consumed, it's a valid number
+		return pos == str.length();
+	}
+	catch (std::invalid_argument&) {
+		// If the string could not be converted to a number, return false
+		return false;
+	}
+	catch (std::out_of_range&) {
+		// If the number is too large or small to fit in the output type, return false
+		return false;
+	}
+}
+
 bool ReadPLY_Header(wifstream &fin, PLY_DATA &plydata)
 {
 	wstring str;
-	TCHAR szData[256];
-	TCHAR *szTmp = NULL;
-	TCHAR *context = NULL;
+	wchar_t szData[1024];
+	wchar_t *context = NULL;
 
 	if (getline(fin, str))
 	{
-		szTmp = wcstok_s(szData, L" \t\r\n", &context);
-		str = szTmp;
+		wcscpy_s(szData, str.c_str());
+		str = wcstok_s(szData, L" \t\r\n", &context);
+		transform(str.begin(), str.end(), str.begin(),
+			[](wchar_t c) -> wchar_t { return towlower(c); });
 		if (str != L"ply")
 			return false;
 	}
@@ -263,13 +294,16 @@ bool ReadPLY_Header(wifstream &fin, PLY_DATA &plydata)
 
 	if (getline(fin, str))
 	{
-		szTmp = wcstok_s(szData, L" \t", &context);
-		str = szTmp;
+		wcscpy_s(szData, str.c_str());
+		str = wcstok_s(szData, L" \t", &context);
+		transform(str.begin(), str.end(), str.begin(),
+			[](wchar_t c) -> wchar_t { return towlower(c); });
 		if (str != L"format")
 			return false;
 
-		szTmp = wcstok_s(szData, L" \t", &context);
-		str = szTmp;
+		str = wcstok_s(NULL, L" \t", &context);
+		transform(str.begin(), str.end(), str.begin(),
+			[](wchar_t c) -> wchar_t { return towlower(c); });
 		if (str == L"ascii")
 			plydata.m_iFormat = FORMAT_ASCII;
 		else if (str == L"binary_little_endian")
@@ -279,8 +313,7 @@ bool ReadPLY_Header(wifstream &fin, PLY_DATA &plydata)
 		else
 			return false;
 
-		szTmp = wcstok_s(szData, L" \t\r\n", &context);
-		str = szTmp;
+		str = wcstok_s(NULL, L" \t\r\n", &context);
 		if (str != L"1.0")
 			return false;
 	}
@@ -290,27 +323,32 @@ bool ReadPLY_Header(wifstream &fin, PLY_DATA &plydata)
 	int iElementCur = ELEMENT_UNKNOWN;
 	while (getline(fin, str))
 	{
-		szTmp = wcstok_s(szData, L" \t\r\n", &context);
-		str = szTmp;
+		wcscpy_s(szData, str.c_str());
+		str = wcstok_s(szData, L" \t\r\n", &context);
+		transform(str.begin(), str.end(), str.begin(),
+			[](wchar_t c) -> wchar_t { return towlower(c); });
 		if (str == L"comment")
 			;
 		else if (str == L"element")
 		{
-			szTmp = wcstok_s(szData, L" \t", &context);
-			str = szTmp;
+			str = wcstok_s(NULL, L" \t", &context);
+			transform(str.begin(), str.end(), str.begin(),
+				[](wchar_t c) -> wchar_t { return towlower(c); });
 			if (str == L"vertex")
 			{
 				iElementCur = ELEMENT_VERTEX;
 
-				szTmp = wcstok_s(szData, L" \t\r\n", &context);
-				plydata.m_iNbVertex = stoi(szTmp);
+				str = wcstok_s(NULL, L" \t\r\n", &context);
+				if (is_number(str))
+					plydata.m_iNbVertex = stoi(str);
 			}
 			else if (str == L"face")
 			{
 				iElementCur = ELEMENT_FACE;
 
-				szTmp = wcstok_s(szData, L" \t\r\n", &context);
-				plydata.m_iNbFace = stoi(szTmp);
+				str = wcstok_s(NULL, L" \t\r\n", &context);
+				if (is_number(str))
+					plydata.m_iNbFace = stoi(str);
 			}
 		}
 		else if (str == L"property")
@@ -319,52 +357,267 @@ bool ReadPLY_Header(wifstream &fin, PLY_DATA &plydata)
 			{
 				VTX_PROP vtxProp;
 
-				szTmp = wcstok_s(szData, L" \t", &context);
-				str = szTmp;
+				str = wcstok_s(NULL, L" \t", &context);
 				vtxProp.SetDataType(str);
 
-				szTmp = wcstok_s(szData, L" \t\r\n", &context);
-				str = szTmp;
+				str = wcstok_s(NULL, L" \t\r\n", &context);
+				transform(str.begin(), str.end(), str.begin(),
+					[](wchar_t c) -> wchar_t { return towlower(c); });
 				vtxProp.SetName(str);
 
 				plydata.m_ayVtxProp.push_back(vtxProp);
 			}
 			else if (iElementCur == ELEMENT_FACE)
 			{
-				szTmp = wcstok_s(szData, L" \t", &context);
-				str = szTmp;
+				str = wcstok_s(NULL, L" \t", &context);
+				transform(str.begin(), str.end(), str.begin(),
+					[](wchar_t c) -> wchar_t { return towlower(c); });
 				if (str != L"list")
 					return false;
 
-				szTmp = wcstok_s(szData, L" \t", &context);
-				str = szTmp;
+				str = wcstok_s(NULL, L" \t", &context);
 				plydata.m_faceProp.SetListNumDataType(str);
 
-				szTmp = wcstok_s(szData, L" \t", &context);
-				str = szTmp;
+				str = wcstok_s(NULL, L" \t", &context);
 				plydata.m_faceProp.SetIndexDataType(str);
 			}
 		}
 		else if (str == L"end_header")
-		{
 			return plydata.m_iNbVertex > 0;
-		}
 	}
 
 	return false;
 }
 
-bool ReadPLY_ASCII(const wstring &strPath, vector<CDot> &ayPoint, vector<CDot> &ayNorm)
+bool ReadPLY_ASCII(wifstream &fin, const PLY_DATA &plydata, MESH_DATA &meshData)
 {
-	return false;
+	bool bRet = false;
+
+	bool bNx = false;
+	bool bNy = false;
+	bool bNz = false;
+	for (UINT_PTR i = 0; i < plydata.m_ayVtxProp.size(); i++)
+	{
+		VTX_PROP vtxProp = plydata.m_ayVtxProp[i];
+
+		if (vtxProp.GetName() == L"nx")
+			bNx = true;
+		else if (vtxProp.GetName() == L"ny")
+			bNy = true;
+		else if (vtxProp.GetName() == L"nz")
+			bNz = true;
+	}
+	bool bHasNorm = bNx && bNy && bNz;
+
+	if (plydata.m_iNbVertex > 0)
+	{
+		meshData.m_ayDot.resize(plydata.m_iNbVertex);
+		if (bHasNorm)
+			meshData.m_ayNormal.resize(plydata.m_iNbVertex);
+		if (plydata.m_iNbFace > 0)
+			meshData.m_ayFace.resize(plydata.m_iNbFace * 3);
+	}
+
+	wstring str;
+	wchar_t szData[1024];
+	wchar_t *context = NULL;
+
+	int iCounter = 0;
+	while (iCounter < plydata.m_iNbVertex)
+	{
+		if (!getline(fin, str))
+			goto READ_END;
+		wcscpy_s(szData, str.c_str());
+
+		for (UINT_PTR i = 0; i < plydata.m_ayVtxProp.size(); i++)
+		{
+			VTX_PROP vtxProp = plydata.m_ayVtxProp[i];
+
+			if (i == 0)
+				str = wcstok_s(szData, L" \t,;", &context);
+			else
+				str = wcstok_s(NULL, L" \t,;\r\n", &context);
+
+			if (!is_number(str))
+				goto READ_END;
+
+			if (vtxProp.GetName() == L"x")
+				meshData.m_ayDot[iCounter].m_x = stod(str);
+			else if (vtxProp.GetName() == L"y")
+				meshData.m_ayDot[iCounter].m_y = stod(str);
+			else if (vtxProp.GetName() == L"z")
+				meshData.m_ayDot[iCounter].m_z = stod(str);
+			else if (vtxProp.GetName() == L"nx")
+				meshData.m_ayNormal[iCounter].m_x = stod(str);
+			else if (vtxProp.GetName() == L"ny")
+				meshData.m_ayNormal[iCounter].m_y = stod(str);
+			else if (vtxProp.GetName() == L"nz")
+				meshData.m_ayNormal[iCounter].m_z = stod(str);
+		}
+
+		iCounter++;
+	}
+
+	iCounter = 0;
+	while (iCounter < plydata.m_iNbFace)
+	{
+		if (!getline(fin, str))
+			goto READ_END;
+		wcscpy_s(szData, str.c_str());
+
+		str = wcstok_s(szData, L" \t,;\r\n", &context);
+		int iListNum = is_number(str) ? stoi(str) : 0;
+		if (iListNum != 3)
+			goto READ_END;
+
+		for (int i = 0; i < 3; i++)
+		{
+			str = wcstok_s(NULL, L" \t,;\r\n", &context);
+			if (!is_number(str))
+				goto READ_END;
+
+			meshData.m_ayFace[3 * iCounter + i] = stoi(str);
+		}
+
+		iCounter++;
+	}
+
+	bRet = true;
+
+READ_END:
+	if (!bRet)
+		meshData.~MESH_DATA();
+
+	return bRet;
 }
 
-bool ReadPLY_Binary(const wstring &strPath, vector<CDot> &ayPoint, vector<CDot> &ayNorm)
+bool ReadPLY_Binary(wifstream &fin, const PLY_DATA &plydata, MESH_DATA meshData)
 {
-	return false;
+	bool bRet = false;
+
+	bool bNx = false;
+	bool bNy = false;
+	bool bNz = false;
+	for (UINT_PTR i = 0; i < plydata.m_ayVtxProp.size(); i++)
+	{
+		VTX_PROP vtxProp = plydata.m_ayVtxProp[i];
+
+		if (vtxProp.GetName() == L"nx")
+			bNx = true;
+		else if (vtxProp.GetName() == L"ny")
+			bNy = true;
+		else if (vtxProp.GetName() == L"nz")
+			bNz = true;
+	}
+	bool bHasNorm = bNx && bNy && bNz;
+
+	if (plydata.m_iNbVertex > 0)
+	{
+		meshData.m_ayDot.resize(plydata.m_iNbVertex);
+		if (bHasNorm)
+			meshData.m_ayNormal.resize(plydata.m_iNbVertex);
+		if (plydata.m_iNbFace > 0)
+			meshData.m_ayFace.resize(plydata.m_iNbFace * 3);
+	}
+
+	int iCounter = 0;
+	while (iCounter < plydata.m_iNbVertex)
+	{
+		for (UINT_PTR i = 0; i < plydata.m_ayVtxProp.size(); i++)
+		{
+			VTX_PROP vtxProp = plydata.m_ayVtxProp[i];
+
+			int iDataSize = vtxProp.GetDataSize();
+			wchar_t *pData = new wchar_t[iDataSize];
+
+			fin.read(pData, iDataSize);
+			BOOL bReadChk;
+			if (bReadChk = fin.gcount() == iDataSize)
+			{
+				if (vtxProp.GetName() == L"x")
+					meshData.m_ayDot[iCounter].m_x = vtxProp.GetData(pData);
+				else if (vtxProp.GetName() == L"y")
+					meshData.m_ayDot[iCounter].m_y = vtxProp.GetData(pData);
+				else if (vtxProp.GetName() == L"z")
+					meshData.m_ayDot[iCounter].m_z = vtxProp.GetData(pData);
+				else if (vtxProp.GetName() == L"nx")
+					meshData.m_ayNormal[iCounter].m_x = vtxProp.GetData(pData);
+				else if (vtxProp.GetName() == L"ny")
+					meshData.m_ayNormal[iCounter].m_y = vtxProp.GetData(pData);
+				else if (vtxProp.GetName() == L"nz")
+					meshData.m_ayNormal[iCounter].m_z = vtxProp.GetData(pData);
+			}
+
+			delete[] pData;
+
+			if (!bReadChk)
+				goto READ_END;
+		}
+
+		iCounter++;
+	}
+
+	iCounter = 0;
+	while (iCounter < plydata.m_iNbFace)
+	{
+		int iDataSize = plydata.m_faceProp.GetListNumDataSize();
+		wchar_t *pData = new wchar_t[iDataSize];
+
+		int iListNum = 0;
+		fin.read(pData, iDataSize);
+		BOOL bReadChk;
+		if (bReadChk = fin.gcount() == iDataSize)
+			iListNum = plydata.m_faceProp.GetListNum(pData);
+
+		delete[] pData;
+
+		if (!bReadChk || (iListNum != 3))
+			goto READ_END;
+
+		iDataSize = plydata.m_faceProp.GetIndexDataSize();
+		pData = new wchar_t[iDataSize];
+
+		for (int i = 0; i < 3; i++)
+		{
+			fin.read(pData, iDataSize);
+			if (bReadChk = fin.gcount() == iDataSize)
+				meshData.m_ayFace[3 * iCounter + i] = plydata.m_faceProp.GetIndex(pData) + 1;
+			else
+				break;
+		}
+
+		delete[] pData;
+
+		if (!bReadChk)
+			goto READ_END;
+	}
+
+	bRet = true;
+
+READ_END:
+	if (!bRet)
+		meshData.~MESH_DATA();
+
+	return bRet;
 }
 
-bool ReadPLY(const wstring &strPath, vector<CDot> &ayPoint, vector<CDot> &ayNorm)
+bool ReadPLY(const wstring &strPath, MESH_DATA &meshData)
 {
-	return false;
+	bool bRet = false;
+
+	wifstream fin;
+	fin.open(strPath, ios::binary);
+
+	PLY_DATA plyData;
+	if (ReadPLY_Header(fin, plyData))
+	{
+		if (plyData.m_iFormat == FORMAT_ASCII)
+			bRet = ReadPLY_ASCII(fin, plyData, meshData);
+		else if (plyData.m_iFormat == FORMAT_BINARY_LITTLE_ENDIAN || plyData.m_iFormat == FORMAT_BINARY_BIG_ENDIAN)
+			bRet = ReadPLY_Binary(fin, plyData, meshData);
+	}
+
+	fin.close();
+
+	return bRet;
 }
