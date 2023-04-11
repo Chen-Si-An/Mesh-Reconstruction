@@ -18,5 +18,22 @@
     <ClCompile Include="MeshReconstruction.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="ReadPLY.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="PCLLib.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReadPLY.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="PCLLib.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
