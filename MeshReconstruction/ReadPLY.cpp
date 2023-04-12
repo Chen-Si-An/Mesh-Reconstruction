@@ -357,20 +357,19 @@ bool ReadPLY(const string &strPath, MESH_DATA &meshData)
 
 	ifstream fin;
 	fin.open(strPath, ios::binary);
+	if (!fin.is_open())
+		return false;
 
-	if (fin.is_open())
+	PLY_DATA plyData;
+	if (ReadPLY_Header(fin, plyData))
 	{
-		PLY_DATA plyData;
-		if (ReadPLY_Header(fin, plyData))
-		{
-			if (plyData.m_iFormat == FORMAT_ASCII)
-				bRet = ReadPLY_ASCII(fin, plyData, meshData);
-			else if (plyData.m_iFormat == FORMAT_BINARY_LITTLE_ENDIAN || plyData.m_iFormat == FORMAT_BINARY_BIG_ENDIAN)
-				bRet = ReadPLY_Binary(fin, plyData, meshData);
-		}
-
-		fin.close();
+		if (plyData.m_iFormat == FORMAT_ASCII)
+			bRet = ReadPLY_ASCII(fin, plyData, meshData);
+		else if (plyData.m_iFormat == FORMAT_BINARY_LITTLE_ENDIAN || plyData.m_iFormat == FORMAT_BINARY_BIG_ENDIAN)
+			bRet = ReadPLY_Binary(fin, plyData, meshData);
 	}
+
+	fin.close();
 
 	return bRet;
 }

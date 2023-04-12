@@ -216,6 +216,11 @@ struct CDot
 		m_y = dY;
 		m_z = dZ;
 	}
+
+	CDot operator-(const CDot& dot)
+	{
+		return CDot(m_x - dot.m_x, m_y - dot.m_y, m_z - dot.m_z);
+	}
 };
 
 typedef struct MESH_DATA
@@ -231,9 +236,9 @@ typedef struct MESH_DATA
 		vector<int>().swap(m_ayFace);
 	}
 
-	bool HasNormals()
+	bool HasNormals() const
 	{
-		return m_ayFace.size() > 0;
+		return m_ayNormal.size() > 0;
 	}
 
 	int NbNodes() const
@@ -244,5 +249,10 @@ typedef struct MESH_DATA
 	CDot Node(int iIndex) const
 	{
 		return m_ayDot[iIndex];
+	}
+
+	int NbTriangles() const
+	{
+		return (int)m_ayFace.size() / 3;
 	}
 } MESH_DATA;

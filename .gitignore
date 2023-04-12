@@ -12,6 +12,7 @@ bin/
 
 [Ext]
 *.pdb
+*.ilk
 *.obj
 *.user
 *.aps
