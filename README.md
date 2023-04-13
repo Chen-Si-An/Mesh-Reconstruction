@@ -8,4 +8,8 @@
 
 2. Surface reconstruction through Poisson: [Mouse_Poisson.stl](https://github.com/Chen-Si-An/MeshReconstruction/blob/main/setup/Mouse_Poisson.stl)
 
-![Image](https://github.com/Chen-Si-An/MeshReconstruction/blob/main/setup/Mouse_Poisson.stl)
+![Image](https://github.com/Chen-Si-An/MeshReconstruction/blob/main/Mouse_mesh_Poisson.bmp)
+
+3. Surface reconstruction through BPA: [Mouse_BPA_OMP.stl](https://github.com/Chen-Si-An/MeshReconstruction/blob/main/setup/Mouse_BPA_OMP.stl)
+
+![Image](https://github.com/Chen-Si-An/MeshReconstruction/blob/main/Mouse_mesh_BPA.bmp)
