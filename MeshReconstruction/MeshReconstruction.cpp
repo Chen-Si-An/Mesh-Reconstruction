@@ -4,7 +4,9 @@
 #include <Windows.h>
 #include "ReadPLY.h"
 #include "PCLLib.h"
+#include "BallPivoting.h"
 #include <fstream>
+#include <time.h>
 
 bool WriteSTL(const MESH_DATA &meshData, const string &strPath);
 
@@ -14,20 +16,42 @@ int main()
 	GetModuleFileNameA(NULL, chBuf, MAX_PATH);
 	string strPath(chBuf);
 	size_t iPos = strPath.find_last_of("\\/");
-	strPath = strPath.substr(0, iPos);
+	strPath = strPath.substr(0, iPos) + "\\";
+
+	string strPLY;
+	cout << "Please input file name of ply:" << endl;
+	cin >> strPLY;
+	cout  << endl;
 
 	MESH_DATA meshData;
-	if (ReadPLY(strPath + "\\bottle.ply", meshData))
+	MESH_DATA meshPoisson;
+	MESH_DATA meshBPA;
+	clock_t tTime;
+	if (ReadPLY(strPath + strPLY + ".ply", meshData))
 		if (meshData.NbTriangles() == 0)
 		{
 			if (!meshData.HasNormals())
 				::NormalEstimation(meshData);
 
-			PoissonSurfaceReconstruction(meshData, meshData);
+			tTime = clock();
+			PoissonSurfaceReconstruction(meshData, meshPoisson);
+			cout << "Poisson: " << (clock() - tTime) / 1000. << " s" << endl;
+
+			tTime = clock();
+			BPASurfaceReconstruction(meshData, meshBPA);
+			cout << "Ball pivoting: " << (clock() - tTime) / 1000. << " s\n" << endl;
 		}
 
 	if (meshData.NbTriangles() != 0)
-		WriteSTL(meshData, strPath + "\\bottle.stl");
+		WriteSTL(meshData, strPath + strPLY + ".stl");
+	if (meshPoisson.NbTriangles() != 0)
+		WriteSTL(meshPoisson, strPath + strPLY + "_Poisson.stl");
+	if (meshBPA.NbTriangles() != 0)
+#ifndef SUP_GPU
+		WriteSTL(meshBPA, strPath + strPLY + "_BPA_OMP.stl");
+#else
+		WriteSTL(meshBPA, strPath + strPLY + "_BPA_GPU.stl");
+#endif // !SUP_GPU
 
 	system("pause");
 	return 0;

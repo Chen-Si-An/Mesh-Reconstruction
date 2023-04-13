@@ -2,7 +2,6 @@
  * Author: rodrigo
  * 2015
  */
-#include "stdafx.h"	//Allen_20221003A_支援BPA點雲轉STL
 #include "Pivoter.h"
 //Allen_20221003A_支援BPA點雲轉STL
 //#include "Writer.h"
@@ -59,7 +58,7 @@ Pivoter::~Pivoter()
 	GpuRoutines::releaseMemory();
 
 	gpuCloud.clear();
-	gpuCloud.swap(std::vector<gpu::Point>());
+	std::vector<gpu::Point>().swap(gpuCloud);
 	delete notUsedArray;
 #endif // SUP_GPU
 	//Allen_20221006A_Ball Pivoting使用GPU加速

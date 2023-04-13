@@ -2,7 +2,6 @@
  * Author: rodrigo
  * 2015
  */
-#include "stdafx.h"	//Allen_20221003A_支援BPA點雲轉STL
 #include "Edge.h"
 //Allen_20221003A_支援BPA點雲轉STL
 //#include <eigen3/Eigen/src/Core/Matrix.h>

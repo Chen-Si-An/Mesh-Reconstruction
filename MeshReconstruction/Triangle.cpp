@@ -2,7 +2,6 @@
  * Author: rodrigo
  * 2015
  */
-#include "stdafx.h"	//Allen_20221003A_¤ä´©BPAÂI¶³ÂàSTL
 #include "Triangle.h"
 #include "Helper.h"
 

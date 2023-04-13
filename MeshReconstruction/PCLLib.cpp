@@ -97,7 +97,6 @@ bool PoissonSurfaceReconstruction(const MESH_DATA &meshData, MESH_DATA &meshResu
 
 	meshResult.m_ayDot.resize(cloudResult.size());
 	meshResult.m_ayFace.resize(polyMesh.polygons.size() * 3);
-
 	PointXYZ point;
 	for (int i = 0; i < (int)cloudResult.size(); i++)
 	{

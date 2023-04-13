@@ -4,8 +4,6 @@
  */
 #pragma once
 
-//#define	SUP_GPU	//Allen_20221006A_Ball Pivoting使用GPU加速
-
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/kdtree/kdtree.h>
 //Allen_20221003A_支援BPA點雲轉STL

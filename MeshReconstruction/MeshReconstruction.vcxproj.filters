@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="CUDA">
+      <UniqueIdentifier>{6f1df649-40ea-4869-831e-15ffe51642d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MeshReconstruction.cpp">
@@ -22,6 +25,24 @@
       <Filter>來源檔案</Filter>
     </ClCompile>
     <ClCompile Include="PCLLib.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="Edge.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="Front.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="Pivoter.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="BallPivoting.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,8 +56,37 @@
     <ClInclude Include="Struct.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="Edge.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Front.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuRoutines.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuStructs.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuUtils.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Pivoter.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="BallPivoting.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GpuRoutines.cu" />
+    <CudaCompile Include="GpuRoutines.cu">
+      <Filter>CUDA</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

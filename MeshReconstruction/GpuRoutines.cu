@@ -168,7 +168,7 @@ __device__ bool isEmpty(const gpu::BallCenter *_center, const gpu::Point *_point
 
 __global__ void checkForSeeds(const gpu::Point *_points, const int _pointNumber, const int *_neighbors, const int _neighborsSize, const bool *_notUsed, const int _index0, const float _ballRadius, const int _neighborsPerThread)
 {
-	///// Assign debug variables /////
+	///// Assign debug variables /////7
 	/*devTreeSize = devKDTree->size;
 	 devTreeRoot = devKDTree->root;
 	 devLeftChild = devKDTree->nodes[devKDTree->root].left;
