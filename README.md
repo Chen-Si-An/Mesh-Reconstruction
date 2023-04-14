@@ -17,3 +17,5 @@
 **Particulary, withing the method of BPA, the process of finding seed can be accelerated by GPU, and to utilize GPU computing, the steps are listed as following:**
   1. Install CUDA Toolkits. Note that to directly compile this project, you should install the version of 11.6.
   2. Switch the configuration of VS to "Debug_GPU" or "Release_GPU".
+
+**BPA is mainly based on <https://github.com/rodschulz/BPA>, with some revisions.**
