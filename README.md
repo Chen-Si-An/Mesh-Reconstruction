@@ -18,4 +18,4 @@
   1. Install CUDA Toolkits. Note that to directly compile this project, you should install the version of 11.6.
   2. Switch the configuration of VS to "Debug_GPU" or "Release_GPU".
 
-**BPA is mainly based on <https://github.com/rodschulz/BPA>, with some revisions.**
+**Note: BPA is mainly based on <https://github.com/rodschulz/BPA>, with some revisions.**
