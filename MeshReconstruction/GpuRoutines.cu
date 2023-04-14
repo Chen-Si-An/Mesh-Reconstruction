@@ -240,7 +240,7 @@ gpu::BallCenter GpuRoutines::findSeed(const std::vector<gpu::Point> *_cloud, con
 
 	int blocks = neighborsSize < MAX_BLOCKS ? (int)neighborsSize : MAX_BLOCKS;
 	int threads = neighborsSize < MAX_THREADS ? (int)neighborsSize : MAX_THREADS;
-	int neighborsPerThread = (int)ceil((double) neighborsSize / threads);
+	int neighborsPerThread = (int)ceil((double)neighborsSize / threads);
 
 	size_t cloudSize = _cloud->size();
 
