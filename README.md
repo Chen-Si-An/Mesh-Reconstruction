@@ -1,4 +1,4 @@
-# MeshReconstruction
+# Mesh Reconstruction
 
 ### This project demonstrates decoding ply file either in ascii or binary form and methods for surface reconstruction, including Poisson and Ball-Pivoting Algorithm.
 
